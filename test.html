@@ -1,2 +1,174 @@
-<h1>hello world</h1>
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>力导向图</title>
+    <link href="../../images/favicon2.ico" rel="shortcut icon">
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <style>
+        .forceLine {
+            stroke: grey ;
+            stroke-width: 4;
+        }
 
+        .forceCircle {
+            stroke: black;
+            stroke-width: 2;
+        }
+
+        .forceText {
+            fill: black;
+            text-anchor: middle;
+            font-size: 20px;
+            font-family: arial;
+        }
+    </style>
+
+</head>
+
+<body background="../../images/bg.jpg">
+
+<script>
+
+    var width = 2000;	//SVG绘制区域的宽度
+    var height = 1000;	//SVG绘制区域的高度
+
+    var svg = d3.select("body")			//选择<body>
+        .append("svg")			//在<body>中添加<svg>
+        .attr("width", width)	//设定<svg>的宽度属性
+        .attr("height", height);//设定<svg>的高度属性
+
+    //1.确定初始数据
+    var nodes = [
+        {id:0,province: "河南",total:9613}, {id:1,province: "山东",total:9082}, {id:2,province: "四川",total:8673},
+        {id:3,province: "广东",total:7859}, {id:4,province: "江苏",total:7381}, {id:5,province: "河北",total:6735},
+        {id:6,province: "湖南",total:6629}, {id:7,province: "安徽",total:6338}, {id:8,province: "湖北",total:5988},
+        {id:9,province: "广西",total:4822}, {id:10,province: "浙江",total:4647}, {id:11,province: "云南",total:4333},
+        {id:12,province: "江西",total:4222}, {id:13,province: "辽宁",total:4203}, {id:14,province: "贵州",total:3837},
+        {id:15,province: "黑龙江",total:3813}, {id:16,province: "陕西",total:3674}, {id:17,province: "福建",total:3466},
+        {id:18,province: "重庆",total:3107}, {id:19,province: "吉林",total:2699}, {id:20,province: "甘肃",total:2593},
+        {id:21,province: "内蒙古",total:2379}, {id:22,province: "新疆",total:1905}, {id:23,province: "上海",total:1625},
+        {id:24,province: "北京",total:1423}, {id:25,province: "天津",total:1007}, {id:26,province: "海南",total:803},
+        {id:27,province: "宁夏",total:572}, {id:28,province: "青海",total:529}, {id:29,province: "西藏",total:267},
+        {id:30,province: "山西",total:3294},];
+    var edges = [
+        {source: 0, target: 1}, {source: 0, target: 5}, {source: 0, target: 6},{source: 0, target: 16}, {source: 0, target: 30},{source: 0, target: 7},
+        {source: 1, target: 5},{source: 1, target: 7},{source: 1, target: 4},
+        {source: 2, target: 14},{source: 2, target: 18},{source: 2, target: 20},{source: 2, target: 11},{source: 2, target: 16},
+        {source: 3, target: 17},{source: 3, target: 12},{source: 3, target: 9},{source: 3, target: 6},
+        {source: 4, target: 7},{source: 4, target: 23},{source: 4, target: 10},
+        {source: 5, target: 24},{source: 5, target: 16},{source: 5, target: 21},{source: 5, target: 13},{source: 5, target: 30},{source: 5, target: 25},
+        {source: 6, target: 8},{source: 6, target: 9},{source: 6, target: 14},{source: 6, target: 18},{source: 6, target: 12},
+        {source: 7, target: 10},{source: 7, target: 12},{source: 7, target: 8},
+        {source: 8, target: 12},{source: 8, target: 16},{source: 8, target: 18},
+        {source: 9, target: 11},{source: 9, target: 14},
+        {source: 10, target: 23},{source: 10, target: 12},{source: 10, target: 17},
+        {source: 11, target: 14},{source: 11, target: 29},
+        {source: 12, target: 17},
+        {source: 13, target: 19},{source: 13, target: 21},
+        {source: 14, target: 18},
+        {source: 15, target: 21},{source: 15, target: 19},
+        {source: 16, target: 20},{source: 16, target: 30},{source: 16, target: 21},{source: 16, target: 27},{source: 16, target: 18},
+        {source: 19, target: 21},
+        {source: 20, target: 21},{source: 20, target: 27},{source: 20, target: 28},{source: 20, target: 22},
+        {source: 21, target: 27},{source: 21, target: 30},
+        {source: 22, target: 28},{source: 22, target: 29},
+        {source: 24, target: 25},
+        {source: 28, target: 29},
+
+        ];
+
+    //2.转换数据
+    var force = d3.layout.force()
+        .nodes(nodes)	//设定顶点数组
+        .links(edges)	//设定边数组
+        .size([width, height])	//设定作用范围
+        .linkDistance(150)	//设定边的距离
+        .charge(-3000);	//设定顶点的电荷数
+
+    force.start();	//开启布局计算
+
+    //3.绘制
+    var color = d3.scale.category20();  //相当于定义颜色的序数比例尺
+
+    //绘制连线
+    var lines = svg.selectAll(".forceLine")
+        .data(edges)
+        .enter()
+        .append("line")
+        .attr("class", "forceLine")
+
+    //绘制节点
+    var circles = svg.selectAll(".forceCircle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("class", "forceCircle")
+        .attr("r", function (d) {
+            return d.total/300+25;
+        })
+        .style("fill", function (d, i) {
+            return color(i);
+        })
+        .call(force.drag);
+
+    //绘制文字
+    var texts = svg.selectAll(".forceText")
+        .data(nodes)
+        .enter()
+        .append("text")
+        .attr("class", "forceText")
+        .attr("dy", ".3em")
+        .text(function (d) {
+            return d.province;
+        });
+
+    var drag = force.drag()
+        .on("dragend", function (d, i) {
+            d.fixed = true;
+            //拖拽结束后变为原来的颜色
+            d3.select(this)
+                .style("fill", color(i));
+        })
+        .on("drag", function (d) {
+            //拖拽中对象变为黄色
+            d3.select(this).style("fill", "yellow");
+        });
+
+    //tick事件的监听器
+    force.on("tick", function () {
+
+        //更新边
+        lines.attr("x1", function (d) {
+            return d.source.x;
+        });
+        lines.attr("y1", function (d) {
+            return d.source.y;
+        });
+        lines.attr("x2", function (d) {
+            return d.target.x;
+        });
+        lines.attr("y2", function (d) {
+            return d.target.y;
+        });
+
+        //更新顶点
+        circles.attr("cx", function (d) {
+            return d.x;
+        });
+        circles.attr("cy", function (d) {
+            return d.y;
+        });
+
+        //更新顶点文字
+        texts.attr("x", function (d) {
+            return d.x;
+        });
+        texts.attr("y", function (d) {
+            return d.y;
+        });
+
+    });
+
+</script>
+</body>
+</html>
